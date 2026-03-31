@@ -25,12 +25,14 @@ const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/tax-calculator';
 
 mongoose.connect(MONGO_URI)
-    .then(() => {
-        console.log('MongoDB connected successfully');
-        app.listen(PORT, () => {
-            console.log(`Server running on port ${PORT}`);
-        });
-    })
-    .catch((err) => {
-        console.error('MongoDB connection error:', err);
+    .then(() => console.log('MongoDB connected successfully'))
+    .catch((err) => console.error('MongoDB connection error:', err));
+
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(PORT, () => {
+        console.log(`Server running locally on port ${PORT}`);
     });
+}
+
+// Export for Vercel Serverless Function
+module.exports = app;

@@ -9,7 +9,7 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     // Axios default config
-    axios.defaults.baseURL = 'http://localhost:5000';
+    axios.defaults.baseURL = import.meta.env.PROD ? '' : 'http://localhost:5000';
 
     useEffect(() => {
         if (token) {
