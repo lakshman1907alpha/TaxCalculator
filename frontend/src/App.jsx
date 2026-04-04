@@ -8,6 +8,9 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Calculate from './pages/Calculate';
 import Report from './pages/Report';
+import AskAi from './pages/AskAi';
+import Compare from './pages/Compare';
+import Simulator from './pages/Simulator';
 import './index.css';
 
 const PrivateRoute = ({ children }) => {
@@ -47,6 +50,30 @@ function App() {
                             element={
                                 <PrivateRoute>
                                     <Report />
+                                </PrivateRoute>
+                            } 
+                        />
+                        <Route 
+                            path="/ask-ai" 
+                            element={
+                                <PrivateRoute>
+                                    <AskAi />
+                                </PrivateRoute>
+                            } 
+                        />
+                        <Route 
+                            path="/compare/:year" 
+                            element={
+                                <PrivateRoute>
+                                    <Compare />
+                                </PrivateRoute>
+                            } 
+                        />
+                        <Route 
+                            path="/simulator" 
+                            element={
+                                <PrivateRoute>
+                                    <Simulator />
                                 </PrivateRoute>
                             } 
                         />

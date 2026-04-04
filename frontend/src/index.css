@@ -8,11 +8,11 @@
   --accent-hover: #79c0ff;
   --text-main: #c9d1d9;
   --text-muted: #8b949e;
-  
+
   --glass-bg: rgba(22, 27, 34, 0.65);
   --glass-border: rgba(255, 255, 255, 0.1);
   --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-  
+
   --surface-color: #161b22;
   --success-color: #238636;
   --danger-color: #da3633;
@@ -37,7 +37,12 @@ body {
   min-height: 100vh;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   color: #fff;
   font-weight: 600;
 }
@@ -151,10 +156,31 @@ a:hover {
   box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.2);
 }
 
+/* Hide number input spinners */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+  /* Firefox */
+  appearance: textfield;
+  /* Standard compatibility */
+}
+
 /* Animations */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .animate-fade-in {

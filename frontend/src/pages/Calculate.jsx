@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import DocumentUpload from '../components/DocumentUpload';
 
 const Calculate = () => {
     const navigate = useNavigate();
@@ -8,8 +9,8 @@ const Calculate = () => {
 
     const [formData, setFormData] = useState({
         year: currentYear - 1,
-        income: { salary: 0, business: 0, freelance: 0, other: 0 },
-        deductions: { standard: 0, investments: 0, medical: 0, other: 0 }
+        income: { salary: '', business: '', freelance: '', other: '' },
+        deductions: { standard: '', investments: '', medical: '', other: '' }
     });
 
     const [result, setResult] = useState(null);
@@ -42,15 +43,32 @@ const Calculate = () => {
         setLoading(false);
     };
 
+    const handleExtractedData = (data) => {
+        setFormData(prev => ({
+            ...prev,
+            income: { 
+                ...prev.income, 
+                salary: data.salary || prev.income.salary 
+            },
+            deductions: { 
+                ...prev.deductions, 
+                investments: data.deductions?.investments80C || prev.deductions.investments,
+                medical: data.deductions?.medical80D || prev.deductions.medical
+            }
+        }));
+    };
+
     return (
         <div className="animate-fade-in" style={styles.container}>
             <div className="glass-card" style={styles.formSection}>
                 <h2 style={{ marginBottom: '1.5rem', color: 'var(--accent-color)' }}>Tax Data Entry</h2>
-                
+
+                <DocumentUpload onExtracted={handleExtractedData} />
+
                 <form onSubmit={handleCalculate}>
                     <div className="form-group">
                         <label className="form-label">Tax Year</label>
-                        <input type="number" className="form-control" name="year" value={formData.year} onChange={(e) => setFormData({...formData, year: Number(e.target.value)})} />
+                        <input type="number" className="form-control" name="year" value={formData.year} onChange={(e) => setFormData({ ...formData, year: Number(e.target.value) })} />
                     </div>
 
                     <h3 style={{ marginTop: '2rem', marginBottom: '1rem' }}>Income Streams</h3>
@@ -106,19 +124,19 @@ const Calculate = () => {
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', fontSize: '1.2rem' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                                 <span>Total Income:</span>
-                                <strong>${result.calculation.totalIncome.toLocaleString()}</strong>
+                                <strong>₹{result.calculation.totalIncome.toLocaleString()}</strong>
                             </div>
                             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                                 <span>Total Allowed Deductions:</span>
-                                <strong style={{ color: 'var(--accent-hover)' }}>-${result.calculation.totalDeductions.toLocaleString()}</strong>
+                                <strong style={{ color: 'var(--accent-hover)' }}>-₹{result.calculation.totalDeductions.toLocaleString()}</strong>
                             </div>
                             <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid var(--glass-border)', paddingTop: '1rem' }}>
                                 <span>Taxable Income:</span>
-                                <strong>${result.calculation.taxableIncome.toLocaleString()}</strong>
+                                <strong>₹{result.calculation.taxableIncome.toLocaleString()}</strong>
                             </div>
                             <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--danger-color)', fontSize: '1.5rem', fontWeight: 'bold' }}>
                                 <span>Total Tax Owed:</span>
-                                <span>${result.calculation.taxOwed.toLocaleString()}</span>
+                                <span>₹{result.calculation.taxOwed.toLocaleString()}</span>
                             </div>
                         </div>
 
@@ -129,13 +147,13 @@ const Calculate = () => {
 
                     {result.suggestions && result.suggestions.length > 0 && (
                         <div className="glass-card animate-fade-in" style={{ marginTop: '2rem', borderLeft: '4px solid var(--warn-color)' }}>
-                            <h3 style={{ color: 'var(--warn-color)', marginBottom: '1rem' }}>Smart Suggestions 💡</h3>
+                            <h3 style={{ color: 'var(--warn-color)', marginBottom: '1rem' }}>You can reduce Tax by :</h3>
                             {result.suggestions.map((s, idx) => (
                                 <div key={idx} style={{ marginBottom: '1rem', paddingBottom: '1rem', borderBottom: idx === result.suggestions.length - 1 ? 'none' : '1px solid var(--glass-border)' }}>
-                                    <h4 style={{ marginBottom: '0.4rem' }}>{s.category} Strategy</h4>
+                                    <h4 style={{ marginBottom: '0.4rem' }}>{s.category || s.section} Strategy</h4>
                                     <p style={{ color: 'var(--text-main)', fontSize: '0.95rem' }}>{s.message}</p>
                                     <div style={{ marginTop: '0.5rem', fontWeight: 'bold', color: 'var(--success-color)' }}>
-                                        Potential Tax Savings: ~${s.potentialSavings.toLocaleString()}
+                                        Potential Tax Savings: ~₹{(s.potentialSaving || s.potentialSavings || 0).toLocaleString()}
                                     </div>
                                 </div>
                             ))}

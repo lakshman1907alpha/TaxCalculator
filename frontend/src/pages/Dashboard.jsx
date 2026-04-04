@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 
+
 const Dashboard = () => {
     const [records, setRecords] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -25,7 +26,9 @@ const Dashboard = () => {
         <div className="animate-fade-in">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
                 <h2>Your Tax Dashboard</h2>
-                <Link to="/calculate" className="btn btn-primary">New Calculation</Link>
+                {records.length > 0 && (
+                    <Link to="/calculate" className="btn btn-primary">New Calculation</Link>
+                )}
             </div>
 
             {records.length === 0 ? (
@@ -46,15 +49,15 @@ const Dashboard = () => {
                             <div style={{ marginBottom: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                                     <span style={{ color: 'var(--text-muted)' }}>Total Income</span>
-                                    <span>${record.calculation.totalIncome.toLocaleString()}</span>
+                                    <span>₹{record.calculation.totalIncome.toLocaleString()}</span>
                                 </div>
                                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                                     <span style={{ color: 'var(--text-muted)' }}>Taxable Income</span>
-                                    <span>${record.calculation.taxableIncome.toLocaleString()}</span>
+                                    <span>₹{record.calculation.taxableIncome.toLocaleString()}</span>
                                 </div>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold' }}>
                                     <span style={{ color: 'var(--danger-color)' }}>Tax Owed</span>
-                                    <span>${record.calculation.taxOwed.toLocaleString()}</span>
+                                    <span>₹{record.calculation.taxOwed.toLocaleString()}</span>
                                 </div>
                             </div>
 

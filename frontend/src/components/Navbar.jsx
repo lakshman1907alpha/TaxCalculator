@@ -20,11 +20,9 @@ const Navbar = () => {
                 <div style={styles.links}>
                     {token ? (
                         <>
-                            <span style={{ marginRight: '1rem', color: 'var(--text-muted)' }}>
-                                Welcome, {user ? user.name : 'User'}
-                            </span>
                             <Link to="/dashboard" style={styles.link}>Dashboard</Link>
-                            <Link to="/calculate" style={styles.link}>Calculate</Link>
+                            <Link to="/ask-ai" style={styles.link}>Ask AI</Link>
+                            <Link to="/simulator" style={styles.link}>Simulator</Link>
                             <button onClick={handleLogout} className="btn btn-outline" style={{ padding: '0.4rem 1rem' }}>Logout</button>
                         </>
                     ) : (
