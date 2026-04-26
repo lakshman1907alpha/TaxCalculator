@@ -1,7 +1,13 @@
 {
   "version": 2,
-  "buildCommand": "cd frontend && npm install && npm run build",
+  "installCommand": "npm install && cd backend && npm install && cd ../frontend && npm install",
+  "buildCommand": "cd frontend && npm run build",
   "outputDirectory": "frontend/dist",
+  "functions": {
+    "backend/server.js": {
+      "runtime": "@vercel/node@5"
+    }
+  },
   "rewrites": [
     {
       "source": "/api/(.*)",

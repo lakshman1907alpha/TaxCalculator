@@ -7,19 +7,32 @@ const { calculateTax } = require('../utils/taxEngine');
 // Create or update a calculation for a specific year
 router.post('/', auth, async (req, res) => {
     try {
-        const { year, income, deductions } = req.body;
+        const { year, income, deductions = {}, age = 'below60' } = req.body;
 
         // Run Tax Engine Logic
-        const engineResult = calculateTax(income, deductions);
+        const engineResult = calculateTax({ incomes: income || {}, deductions, age });
 
         let record = await TaxRecord.findOne({ user: req.user.id, year });
+
+        // Build the calculation object (backwards compat)
+        // Set to whichever regime is recommended so legacy UI isn't broken
+        const isOld = engineResult.recommendation.regime === 'old';
+        const calcObj = {
+            totalIncome: isOld ? engineResult.oldRegime.grossIncome : engineResult.newRegime.grossIncome,
+            totalDeductions: isOld ? engineResult.oldRegime.totalDeductions + engineResult.oldRegime.standardDeduction : engineResult.newRegime.standardDeduction,
+            taxableIncome: isOld ? engineResult.oldRegime.taxableIncome : engineResult.newRegime.taxableIncome,
+            taxOwed: isOld ? engineResult.oldRegime.totalTax : engineResult.newRegime.totalTax
+        };
 
         if (record) {
             // Update
             record.income = income;
             record.deductions = deductions;
-            record.calculation = engineResult.calculation;
+            record.calculation = calcObj;
             record.suggestions = engineResult.suggestions;
+            record.regimeComparison = { oldRegime: engineResult.oldRegime, newRegime: engineResult.newRegime };
+            record.recommendedRegime = engineResult.recommendation.regime;
+            record.regimeSavings = engineResult.recommendation.savings;
         } else {
             // Create
             record = new TaxRecord({
@@ -27,13 +40,25 @@ router.post('/', auth, async (req, res) => {
                 year,
                 income,
                 deductions,
-                calculation: engineResult.calculation,
-                suggestions: engineResult.suggestions
+                calculation: calcObj,
+                suggestions: engineResult.suggestions,
+                regimeComparison: { oldRegime: engineResult.oldRegime, newRegime: engineResult.newRegime },
+                recommendedRegime: engineResult.recommendation.regime,
+                regimeSavings: engineResult.recommendation.savings
             });
         }
 
         await record.save();
-        res.json(record);
+        
+        const responseData = record.toJSON();
+        responseData.regimeComparison = { oldRegime: engineResult.oldRegime, newRegime: engineResult.newRegime }; // explicitly ensure the frontend gets full object
+        responseData.recommendedRegime = engineResult.recommendation.regime;
+        responseData.regimeSavings = engineResult.recommendation.savings;
+        if (!responseData.recommendation) {
+            responseData.recommendation = engineResult.recommendation;
+        }
+
+        res.json(responseData);
 
     } catch (err) {
         console.error(err.message);
